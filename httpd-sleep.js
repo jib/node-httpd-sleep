@@ -21,6 +21,7 @@ cli.command('run')
     if( cli.debug ) {
         U.debug( "Listening on port: " + port );
         U.debug( "Sending response code: " + resp );
+        U.debug( "Sleep time in: " + unit );
     }
 
     http.createServer(function(request, response) {
