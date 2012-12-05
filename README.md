@@ -1,4 +1,5 @@
 node-httpd-sleep
 ================
 
-Simple HTTPD that sleeps for a certain amount of time to simulate response latency.
+Simple HTTP daemon that can sleep for a amount of time (in seconds or
+microseconds) as specified through a URL fragment.
