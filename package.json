@@ -1,0 +1,17 @@
+{
+  "name":           "node-httpd-sleep"
+, "version":        "0.0.1"
+, "description":    "Simple HTTPD that sleeps for a certain amount of time to simulate response latency."
+, "tags":           ["httpd", "http", "latency", "sleep", "simulate"]
+, "author":         "Jos Boumans <jos@dwim.org>"
+, "dependencies": {
+    "sleep": ">= 1.1.0"
+  }
+, "repository":     {
+     "type":    "git"
+,    "url":     "https://github.com/jib/node-httpd-sleep.git"
+  }
+, "bugs":           { "url": "https://github.com/jib/node-httpd-sleep/issues" }
+, "licences":       [ { "type": "MIT" } ]
+, "main":           "./httpd-sleep.js"
+}
