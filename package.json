@@ -5,8 +5,7 @@
 , "tags":           ["httpd", "http", "latency", "sleep", "simulate"]
 , "author":         "Jos Boumans <jos@dwim.org>"
 , "dependencies": {
-    "sleep": ">= 1.1.0"
-,   "commander": ">= 1.1.1"
+    "commander": ">= 1.1.1"
   }
 , "repository":     {
      "type":    "git"
