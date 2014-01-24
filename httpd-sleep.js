@@ -3,14 +3,16 @@ var U     = require('util');
 var cli   = require('commander');
 
 // Setup options
-cli.version('0.0.2')
+cli.version('0.0.3')
 .option('-r, --response-code <HTTP response code>', 'HTTP response code to send')
 .option('-p, --port <port>',                        'Port to listen on')
 .option('-d, --debug',                              'Enable Debug output');
 
 // ### Command: launch
 cli.command('run')
-.description('Add /sleep:DIGITS/ to the URL path to sleep for DIGITS (micro)seconds')
+.description("Add /sleep:DIGITS/ to the URL path to sleep for DIGITS milliseconds\n" +
+             "                       " + // ugly hack to align description
+             "Add /response:DIGITS/ to the url to respond with HTTP DIGITS code")
 .action(function() {
     var port = cli.port         || 7001;
     var resp = cli.responseCode || 200;
