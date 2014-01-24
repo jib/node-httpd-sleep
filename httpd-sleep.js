@@ -1,13 +1,11 @@
 var http  = require("http");
 var U     = require('util');
-var sleep = require('sleep');
 var cli   = require('commander');
 
 // Setup options
 cli.version('0.0.2')
 .option('-r, --response-code <HTTP response code>', 'HTTP response code to send')
 .option('-p, --port <port>',                        'Port to listen on')
-.option('-n, --micro-seconds',                      'Sleep time provided in microseconds')
 .option('-d, --debug',                              'Enable Debug output');
 
 // ### Command: launch
@@ -16,12 +14,10 @@ cli.command('run')
 .action(function() {
     var port = cli.port         || 7001;
     var resp = cli.responseCode || 200;
-    var unit = cli.microSeconds ? "micro seconds" : "seconds";
 
     if( cli.debug ) {
         U.debug( "Listening on port: " + port );
         U.debug( "Sending default response code: " + resp );
-        U.debug( "Sleep time in: " + unit );
     }
 
     http.createServer(function(request, response) {
@@ -39,19 +35,23 @@ cli.command('run')
         U.debug( "===========================" );
         U.debug( "URL: "           + U.inspect( request.url ) );
         U.debug( "Headers: "       + U.inspect( request.headers ) );
-        U.debug( "Sleep for: "     + (sleep_time || 0) + " " + unit );
+        U.debug( "Sleep for: "     + (sleep_time || 0) + " ms" );
         U.debug( "Response code: " + resp_code );
       }
 
       // sleep
       if( sleep_time ) {
         var i = parseInt( sleep_time );
-        cli.microSeconds ? sleep.usleep( i ) : sleep.sleep( i );
+        setTimeout( function() {
+          // response
+          response.writeHead( resp_code );
+          response.end();
+        }, i);
+      } else {
+        // response
+        response.writeHead( resp_code );
+        response.end();
       }
-
-      // response
-      response.writeHead( resp_code );
-      response.end();
 
     }).listen( port );
 });
