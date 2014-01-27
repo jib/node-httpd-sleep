@@ -6,7 +6,8 @@ var cli   = require('commander');
 cli.version('0.0.4')
 .option('-r, --response-code <HTTP response code>', 'HTTP response code to send')
 .option('-p, --port <port>',                        'Port to listen on')
-.option('-d, --debug',                              'Enable Debug output');
+.option('-d, --debug',                              'Enable debug output')
+.option('-H, --header',                             'Enable debug header');
 
 // ### Command: launch
 cli.command('run')
@@ -47,18 +48,26 @@ cli.command('run')
         U.debug( "Response code: " + resp_code );
       }
 
+      // we may respond asynchronously, so store the response in a function
+      var response_func = function() {
+
+          // if running in debug mode, also send a debug header
+          if( cli.header ) {
+              response.setHeader( 'X-Httpd-Slept', sleep_time || 0);
+          }
+
+          response.writeHead( resp_code );
+          response.end();
+      }
+
       // sleep
       if( sleep_time ) {
         var i = parseInt( sleep_time );
         setTimeout( function() {
-          // response
-          response.writeHead( resp_code );
-          response.end();
+          response_func();
         }, i);
       } else {
-        // response
-        response.writeHead( resp_code );
-        response.end();
+        response_func();
       }
 
     }).listen( port );
