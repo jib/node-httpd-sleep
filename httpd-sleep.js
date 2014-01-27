@@ -4,10 +4,11 @@ var cli   = require('commander');
 
 // Setup options
 cli.version('0.0.4')
-.option('-r, --response-code <HTTP response code>', 'HTTP response code to send')
-.option('-p, --port <port>',                        'Port to listen on')
-.option('-d, --debug',                              'Enable debug output')
-.option('-H, --header',                             'Enable debug header');
+.option('-r, --response-code <HTTP response code>',     'HTTP response code to send')
+.option('-p, --port <port>',                            'Port to listen on')
+.option('-d, --debug',                                  'Enable debug output')
+.option('-D, --debug-header',                           'Enable debug header')
+.option('-H, --headers <Header:Value>,<Header:Value>',  'Add response header');
 
 // ### Command: launch
 cli.command('run')
@@ -17,12 +18,24 @@ cli.command('run')
              "                       " + // ugly hack to align description
              "Alternately, send X-Httdp-Sleep and/or X-Httdp-Response headers")
 .action(function() {
-    var port = cli.port         || 7001;
-    var resp = cli.responseCode || 200;
+    var port             = cli.port         || 7001;
+    var resp             = cli.responseCode || 200;
+    var response_headers = { };
+
+    // We get a list like: foo:1,bar:2 etc and we intend to coerce that into
+    // { foo: 1, bar: 2} as headers to send.
+    if( cli.headers ) {
+      var hlist = cli.headers.split(',');
+      for( var i in hlist ) {
+        var kv = hlist[i].split(':');
+        response_headers[ kv[0] ] = kv[1];
+      }
+    }
 
     if( cli.debug ) {
-        U.debug( "Listening on port: " + port );
-        U.debug( "Sending default response code: " + resp );
+      U.debug( "Listening on port: " + port );
+      U.debug( "Sending default response code: " + resp );
+      U.debug( "Sending headers: " + U.inspect(response_headers) );
     }
 
     http.createServer(function(request, response) {
@@ -42,10 +55,14 @@ cli.command('run')
       // diagnostics
       if( cli.debug ) {
         U.debug( "===========================" );
-        U.debug( "URL: "           + U.inspect( request.url ) );
-        U.debug( "Headers: "       + U.inspect( request.headers ) );
-        U.debug( "Sleep for: "     + (sleep_time || 0) + " ms" );
-        U.debug( "Response code: " + resp_code );
+        U.debug( "URL: "              + U.inspect( request.url ) );
+        U.debug( "Headers: "          + U.inspect( request.headers ) );
+        U.debug( "Sleep for: "        + (sleep_time || 0) + " ms" );
+        U.debug( "Response code: "    + resp_code );
+
+        if( cli.headers ) {
+          U.debug( "Response headers: " + U.inspect( response_headers ) );
+        }
       }
 
       // we may respond asynchronously, so store the response in a function
@@ -56,7 +73,7 @@ cli.command('run')
               response.setHeader( 'X-Httpd-Slept', sleep_time || 0);
           }
 
-          response.writeHead( resp_code );
+          response.writeHead( resp_code, response_headers );
           response.end();
       }
 
