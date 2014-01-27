@@ -3,7 +3,7 @@ var U     = require('util');
 var cli   = require('commander');
 
 // Setup options
-cli.version('0.0.3')
+cli.version('0.0.4')
 .option('-r, --response-code <HTTP response code>', 'HTTP response code to send')
 .option('-p, --port <port>',                        'Port to listen on')
 .option('-d, --debug',                              'Enable Debug output');
@@ -12,7 +12,9 @@ cli.version('0.0.3')
 cli.command('run')
 .description("Add /sleep:DIGITS/ to the URL path to sleep for DIGITS milliseconds\n" +
              "                       " + // ugly hack to align description
-             "Add /response:DIGITS/ to the url to respond with HTTP DIGITS code")
+             "Add /response:DIGITS/ to the url to respond with HTTP DIGITS code\n\n" +
+             "                       " + // ugly hack to align description
+             "Alternately, send X-Httdp-Sleep and/or X-Httdp-Response headers")
 .action(function() {
     var port = cli.port         || 7001;
     var resp = cli.responseCode || 200;
@@ -23,14 +25,18 @@ cli.command('run')
     }
 
     http.createServer(function(request, response) {
+      // The request headers
+      var headers    = request.headers || {};
+      var h_sleep    = headers['x-httpd-sleep']    || false;
+      var h_response = headers['x-httpd-response'] || resp;
 
       // How long to sleep for
       var sleep_match = request.url.match( /\/sleep:(\d+)/ );
-      var sleep_time  = sleep_match && sleep_match[0] ? sleep_match[1] : false;
+      var sleep_time  = parseInt(sleep_match && sleep_match[0] ? sleep_match[1] : h_sleep);
 
       // Response code
       var resp_match = request.url.match( /\/response:(\d+)/ );
-      var resp_code  = resp_match && resp_match[0] ? resp_match[1] : resp;
+      var resp_code  = parseInt(resp_match && resp_match[0] ? resp_match[1] : h_response);
 
       // diagnostics
       if( cli.debug ) {
