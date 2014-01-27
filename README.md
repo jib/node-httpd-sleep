@@ -1,7 +1,7 @@
 node-httpd-sleep
 ================
 
-Simple non-blocking HTTP daemon that can sleep for a amount of time (in milliseconds) and return a specific HTTP response code as specified through URL fragments.
+Simple non-blocking HTTP daemon that can sleep for a amount of time (in milliseconds) and return a specific HTTP response code as specified through URL fragments or HTTP request headers.
 
 installation
 ------------
