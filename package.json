@@ -1,6 +1,6 @@
 {
   "name":           "node-httpd-sleep"
-, "version":        "0.0.4"
+, "version":        "0.0.5"
 , "description":    "Simple HTTPD that sleeps for a certain amount of time to simulate response latency."
 , "tags":           ["httpd", "http", "latency", "sleep", "simulate"]
 , "author":         "Jos Boumans <jos@dwim.org>"
