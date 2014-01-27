@@ -129,8 +129,8 @@ DEBUG: Sleep for: 1000 ms
 DEBUG: Response code: 204
 ```
 
-url path vs param
------------------
+url path vs param vs headers
+----------------------------
 
 And wherever you put that in the URL is up to you. You can send it as a query param as well:
 
@@ -158,5 +158,30 @@ DEBUG: Sleep for: 1000 ms
 DEBUG: Response code: 204
 ```
 
+Or you can send it as part of the request headers. Note that if you send both request headers AND url fragments, the url fragments will have higher priority:
+
+```
+$ time curl -H 'X-Httpd-Sleep: 1000' -H 'X-Httpd-Response: 204' -I http://localhost:8888/
+HTTP/1.1 204 No Content
+Date: Mon, 27 Jan 2014 19:40:40 GMT
+Connection: keep-alive
 
 
+real  0m1.016s
+user  0m0.004s
+sys   0m0.005s
+```
+
+On the server console, you will see:
+
+```
+DEBUG: ===========================
+DEBUG: URL: '/'
+DEBUG: Headers: { 'user-agent': 'curl/7.30.0',
+  host: 'localhost:8888',
+  accept: '*/*',
+  'x-httpd-sleep': '1000',
+  'x-httpd-response': '204' }
+DEBUG: Sleep for: 1000 ms
+DEBUG: Response code: 204
+```
