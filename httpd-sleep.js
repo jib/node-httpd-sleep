@@ -8,8 +8,8 @@ cli.version('0.0.5')
 .option('-p, --port <port>',                            'Port to listen on')
 .option('-d, --debug',                                  'Enable debug output')
 .option('-D, --debug-header',                           'Enable debug header')
-.option('-H, --headers <Header:Value>,<Header:Value>',  'Add response header');
-
+.option('-H, --headers <Header:Value>,<Header:Value>',  'Add response header')
+.option('-b, --body <response>',                        'Add response body');
 // ### Command: launch
 cli.command('run')
 .description("Add /sleep:DIGITS/ to the URL path to sleep for DIGITS milliseconds\n" +
@@ -20,6 +20,7 @@ cli.command('run')
 .action(function() {
     var port             = cli.port         || 7001;
     var resp             = cli.responseCode || 200;
+    var body             = cli.body         || false;
     var response_headers = { };
 
     // We get a list like: foo:1,bar:2 etc and we intend to coerce that into
@@ -28,8 +29,13 @@ cli.command('run')
       var hlist = cli.headers.split(',');
       for( var i in hlist ) {
         var kv = hlist[i].split(':');
-        response_headers[ kv[0] ] = kv[1];
+        response_headers[ kv[0].toLowerCase() ] = kv[1];
       }
+    }
+
+    // we should always send a content-type if we have a body
+    if( body && !response_headers['content-type'] ) {
+        response_headers['content-type'] = 'text/plain';
     }
 
     if( cli.debug ) {
@@ -73,7 +79,14 @@ cli.command('run')
               response.setHeader( 'X-Httpd-Slept', sleep_time || 0);
           }
 
+          // headesr must be set before the body
           response.writeHead( resp_code, response_headers );
+
+          // are we sending any content?
+          if( body ) {
+            response.write(body);
+          }
+
           response.end();
       }
 
